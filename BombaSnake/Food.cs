@@ -25,13 +25,16 @@ namespace BombaSnake
 
             _sourceRect = source;
 
+            //Position the food at a random location in the window.
             _position = new Vector2(Globals._rng.Next(0, Globals._windowSize.X), Globals._rng.Next(0, Globals._windowSize.Y));
 
+            //Make sure the food position is on the grid.
             _position = SnapToGrid(_position, 32);
         }
 
         public void UpdateFood()
         {
+            //Update the food collision.
             UpdateCollision();
         }
 
@@ -45,8 +48,11 @@ namespace BombaSnake
 
         public void RandomisePosition()
         {
-            _position = new Vector2(Globals._rng.Next(0, Globals._windowSize.X), Globals._rng.Next(0, Globals._windowSize.Y));
+            //Randomise the food position within the window.
+            _position = new Vector2(Globals._rng.Next(0, Globals._windowSize.X - _sourceRect.Width),
+                Globals._rng.Next(0, Globals._windowSize.Y - _sourceRect.Height));
 
+            //Snap the food position to the grid.
             _position = SnapToGrid(_position, 32);
         }
 

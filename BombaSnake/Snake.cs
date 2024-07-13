@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace BombaSnake
@@ -36,24 +37,27 @@ namespace BombaSnake
 
         public void UpdateSnake(GameTime gameTime, KeyboardState keyboardState, List<Snake> parts)
         {
+            //Update the collision for all parts of the snake.
             UpdateCollision(parts);
 
+            //Check the inputs made by the player.
             CheckInputs(keyboardState);
 
-            if (Globals._timer <= 0)
+            for(int i = 0; i < parts.Count - 1; i++)
             {
-                parts[0].UpdateSnakePosition(gameTime, parts);
-                Globals._timer = Globals._stepTimer;
-            }
-            else
-            {
-                Globals._timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                for(int j = 0; j < parts.Count - 1; j++)
+                {
+                    if (parts[i] != parts[j] && parts[i]._colRect.Intersects(parts[j]._colRect))
+                    {
+                        Debug.WriteLine("I collided");
+                    }
+                }
             }
         }
 
         public static Vector2 SnapToGrid(Vector2 position, int gridSize)
         {
-            //Round the X and Y positions to the nearest multiple of gridSize
+            //Round the X and Y positions to the nearest multiple of gridSize.
             position.X = (float)Math.Round(position.X / gridSize) * gridSize;
             position.Y = (float)Math.Round(position.Y / gridSize) * gridSize;
             return position;
@@ -88,11 +92,17 @@ namespace BombaSnake
             }
         }
 
-
-        public void UpdateSnakePosition(GameTime gameTime, List<Snake> parts)
+        //Function to update the snakes position.
+        public void UpdateSnakePosition(GameTime gameTime, List<Snake> parts, bool addPart)
         {
             //Create a position for the head to move to.
             Vector2 newPosition = _position + (_direction * _gridSize);
+
+            if(addPart)
+            {
+                parts.Add(new Snake(_texture, new Rectangle(32, 0, 32, 32), _debugPixel));
+                Game1.addPart = false;
+            }
 
             //Loop through the list of parts backwards...
             for (int i = parts.Count - 1; i > 0; i--)
@@ -105,14 +115,15 @@ namespace BombaSnake
             parts[0]._position = newPosition;
         }
 
+        //Function to update the snakes collision boxes.
         void UpdateCollision(List<Snake> parts)
         {
             foreach (Snake eachPart in parts)
             {
                 eachPart._colRect = new Rectangle((int)eachPart._position.X + 4,
-                (int)eachPart._position.Y + 4,
-                eachPart._sourceRect.Width - 8,
-                eachPart._sourceRect.Height - 8);
+                    (int)eachPart._position.Y + 4,
+                    eachPart._sourceRect.Width - 8,
+                    eachPart._sourceRect.Height - 8);
             }
         }
 

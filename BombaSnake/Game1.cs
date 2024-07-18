@@ -7,10 +7,23 @@ namespace BombaSnake
 {
     public class Game1 : Game
     {
+        public enum GameState
+        {
+            Title,
+            Game,
+            GameOver
+        }
+
         private GraphicsDeviceManager _graphics;
+
+        //The starting game state.
+        public static GameState gameState = GameState.Game;
 
         //A boolean accessable to all classes to decide whether to add a body part or not.
         public static bool addPart = false;
+
+        //A boolean accessable to all classes to decide whether to add a body part or not.
+        public static bool addBomb = false;
 
         //A list to hold all the parts of the snake.
         List<Snake> parts = new List<Snake>();
@@ -18,12 +31,14 @@ namespace BombaSnake
         //The main snake Texture.
         Texture2D texture;
         //A pixel texture to debug rectangles.
-        Texture2D debugpixel;
+        Texture2D debugPixel;
 
         //A variable to store the keyboard state.
         KeyboardState keyboardState;
 
         Food food;
+
+        Bomb bomb;
 
         public Game1()
         {
@@ -54,21 +69,38 @@ namespace BombaSnake
             texture = Content.Load<Texture2D>("Textures/Snake");
 
             //Load the debug texture.
-            debugpixel = Content.Load<Texture2D>("Textures/DebugPixel");
+            debugPixel = Content.Load<Texture2D>("Textures/DebugPixel");
 
             //Add the head to the parts list.
-            parts.Add(new Snake(texture, new Rectangle(0, 0, 32, 32), debugpixel));
+            parts.Add(new Snake(texture, new Rectangle(0, 0, 32, 32), debugPixel));
             //Add two body parts to the snake.
-            //parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugpixel));
-            //parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugpixel));
+            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel));
+            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel));
 
-            food = new Food(texture, new Rectangle(0, 32, 32, 32), debugpixel);
+            parts[0].SetUpBody(parts);
+
+            food = new Food(texture, new Rectangle(0, 32, 32, 32), debugPixel);
+
+            bomb = new Bomb(texture, new Rectangle(32, 32, 32, 32), debugPixel);
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            switch (gameState)
+            {
+                case GameState.Title:
+                    UpdateTitle();
+                    break;
+                case GameState.Game:
+                    UpdateGame();
+                    break;
+                case GameState.GameOver:
+                    UpdateGameOver();
+                    break;
+            }
 
             //Store the state of the keyboard.
             keyboardState = Keyboard.GetState();
@@ -85,13 +117,30 @@ namespace BombaSnake
             //Update the food.
             food.UpdateFood();
 
-            //If the head of the snake collides with the food...
-            if (parts[0]._colRect.Intersects(food._colRect))
+            bomb.UpdateBomb();
+
+            foreach(Snake eachPart in parts)
             {
-                //Call the Randomise position function inside the food class.
-                food.RandomisePosition();
-                //Set the add part boolean to true.
-                addPart = true;
+                if(eachPart == parts[0] && parts[0]._colRect.Intersects(food._colRect))
+                {
+                    //Call the Randomise position function inside the food class.
+                    food.RandomisePosition();
+                    //Set the add part boolean to true.
+                    addPart = true;
+                }
+                else if(eachPart != parts[0] && eachPart._colRect.Intersects(food._colRect))
+                {
+                    //Call the Randomise position function inside the food class.
+                    food.RandomisePosition();
+                }
+
+                if(eachPart == parts[0] && parts[0]._colRect.Intersects(bomb._colRect))
+                {
+                    bomb.RandomisePosition();
+
+                    addPart = true;
+                    addBomb = true;
+                }
             }
 
             //If the timer is less than or equal to zero...
@@ -99,7 +148,7 @@ namespace BombaSnake
             {
                 //Update the head positioin of the snake.
                 //Which in turn updates the other parts of the snake.
-                parts[0].UpdateSnakePosition(gameTime, parts, addPart);
+                parts[0].UpdateSnakePosition(gameTime, parts, addPart, addBomb);
                 Globals._timer = Globals._stepTimer;
             }
             //Or else...
@@ -112,16 +161,46 @@ namespace BombaSnake
             base.Update(gameTime);
         }
 
+        void UpdateTitle()
+        {
+
+        }
+
+        void UpdateGame()
+        {
+
+        }
+
+        void UpdateGameOver()
+        {
+
+        }
+
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.DarkGray);
 
             // TODO: Add your drawing code here
 
             Globals._spriteBatch.Begin();
 
+            switch (gameState)
+            {
+                case GameState.Title:
+                    DrawTitle();
+                    break;
+                case GameState.Game:
+                    DrawGame();
+                    break;
+                case GameState.GameOver:
+                    DrawGameOver();
+                    break;
+            }
+
             //Draw the food to the screen.
             food.DrawFood();
+
+            bomb.DrawBomb();
 
             //For each part of the snake...
             foreach (Snake eachPart in parts)
@@ -134,5 +213,21 @@ namespace BombaSnake
 
             base.Draw(gameTime);
         }
+
+        void DrawTitle()
+        {
+
+        }
+
+        void DrawGame()
+        {
+
+        }
+
+        void DrawGameOver()
+        {
+
+        }
+
     }
 }

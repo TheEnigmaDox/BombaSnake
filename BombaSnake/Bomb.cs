@@ -1,14 +1,10 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-
 
 namespace BombaSnake
 {
-    internal class Food
+    internal class Bomb
     {
         Vector2 _position;
 
@@ -18,7 +14,7 @@ namespace BombaSnake
         Texture2D _texture;
         Texture2D _debugPixel;
 
-        public Food(Texture2D texture, Rectangle source, Texture2D debugPixel)
+        public Bomb(Texture2D texture, Rectangle source, Texture2D debugPixel)
         {
             _texture = texture;
             _debugPixel = debugPixel;
@@ -32,9 +28,8 @@ namespace BombaSnake
             _position = Globals.SnapToGrid(_position, 32);
         }
 
-        public void UpdateFood()
+        public void UpdateBomb()
         {
-            //Update the food collision.
             UpdateCollision();
         }
 
@@ -53,7 +48,7 @@ namespace BombaSnake
             _colRect = new Rectangle((int)_position.X + 3, (int)_position.Y + 3, _sourceRect.Width - 6, _sourceRect.Height - 6);
         }
 
-        public void DrawFood()
+        public void DrawBomb()
         {
             //Globals._spriteBatch.Draw(_debugPixel, _colRect, Color.White);
             Globals._spriteBatch.Draw(_texture, _position, _sourceRect, Color.White);

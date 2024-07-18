@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 
 namespace BombaSnake
@@ -32,7 +33,23 @@ namespace BombaSnake
             _position = new Vector2(Globals._windowSize.X / 2 - _sourceRect.Width / 2,
                  Globals._windowSize.Y / 2 - _sourceRect.Height / 2);
 
-            _position = SnapToGrid(_position, _gridSize);
+            _position = Globals.SnapToGrid(_position, _gridSize);
+        }
+
+        public void SetUpBody(List<Snake> parts)
+        {
+            //Create a position for the head to move to.
+            Vector2 newPosition = _position + (_direction * _gridSize);
+
+            //Loop through the list of parts backwards...
+            for (int i = parts.Count - 1; i > 0; i--)
+            {
+                //...Set each position to the one before it.
+                parts[i]._position = parts[i - 1]._position;
+            }
+
+            //Move the head to the new position.
+            parts[0]._position = newPosition;
         }
 
         public void UpdateSnake(GameTime gameTime, KeyboardState keyboardState, List<Snake> parts)
@@ -42,10 +59,11 @@ namespace BombaSnake
 
             //Check the inputs made by the player.
             CheckInputs(keyboardState);
+            CheckPosition();
 
-            for(int i = 0; i < parts.Count - 1; i++)
+            for (int i = 0; i < parts.Count - 1; i++)
             {
-                for(int j = 0; j < parts.Count - 1; j++)
+                for (int j = 0; j < parts.Count - 1; j++)
                 {
                     if (parts[i] != parts[j] && parts[i]._colRect.Intersects(parts[j]._colRect))
                     {
@@ -55,12 +73,25 @@ namespace BombaSnake
             }
         }
 
-        public static Vector2 SnapToGrid(Vector2 position, int gridSize)
+        void CheckPosition()
         {
-            //Round the X and Y positions to the nearest multiple of gridSize.
-            position.X = (float)Math.Round(position.X / gridSize) * gridSize;
-            position.Y = (float)Math.Round(position.Y / gridSize) * gridSize;
-            return position;
+            if (_position.X > Globals._windowSize.X)
+            {
+                _position.X = 0;
+            }
+            else if (_position.X < 0)
+            {
+                _position.X = Globals._windowSize.X - _sourceRect.Width;
+            }
+
+            if (_position.Y > Globals._windowSize.Y)
+            {
+                _position.Y = 0;
+            }
+            else if (_position.Y < 0)
+            {
+                _position.Y = Globals._windowSize.Y - _sourceRect.Height;
+            }
         }
 
         //Check the inputs and only change the direction if a viable direction is chosen.
@@ -93,7 +124,7 @@ namespace BombaSnake
         }
 
         //Function to update the snakes position.
-        public void UpdateSnakePosition(GameTime gameTime, List<Snake> parts, bool addPart)
+        public void UpdateSnakePosition(GameTime gameTime, List<Snake> parts, bool addPart, bool addBomb)
         {
             //Create a position for the head to move to.
             Vector2 newPosition = _position + (_direction * _gridSize);
@@ -102,6 +133,10 @@ namespace BombaSnake
             {
                 parts.Add(new Snake(_texture, new Rectangle(32, 0, 32, 32), _debugPixel));
                 Game1.addPart = false;
+            }
+            else if(addPart && addBomb)
+            {
+                parts.Add(new Snake(_texture, new Rectangle(32, 32, 32, 32), _debugPixel));
             }
 
             //Loop through the list of parts backwards...

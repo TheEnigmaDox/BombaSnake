@@ -20,15 +20,19 @@ namespace BombaSnake
         Rectangle _sourceRect;
         public Rectangle _colRect;
 
+        Color _partColour;
+
         Texture2D _texture;
         Texture2D _debugPixel;
 
-        public Snake(Texture2D texture, Rectangle sourceRect, Texture2D debugPixel) 
+        public Snake(Texture2D texture, Rectangle sourceRect, Texture2D debugPixel, Color partColour) 
         {
             _texture = texture;
             _debugPixel = debugPixel;
 
             _sourceRect = sourceRect;
+
+            _partColour = partColour;
 
             _position = new Vector2(Globals._windowSize.X / 2 - _sourceRect.Width / 2,
                  Globals._windowSize.Y / 2 - _sourceRect.Height / 2);
@@ -65,8 +69,9 @@ namespace BombaSnake
             {
                 for (int j = 0; j < parts.Count - 1; j++)
                 {
-                    if (parts[i] != parts[j] && parts[i]._colRect.Intersects(parts[j]._colRect))
+                    if (parts[i] != parts[j] && parts[i] == parts[0] && parts[i]._colRect.Intersects(parts[j]._colRect))
                     {
+                        Game1.gameState = Game1.GameState.GameOver;
                         Debug.WriteLine("I collided");
                     }
                 }
@@ -131,12 +136,14 @@ namespace BombaSnake
 
             if(addPart)
             {
-                parts.Add(new Snake(_texture, new Rectangle(32, 0, 32, 32), _debugPixel));
+                parts.Add(new Snake(_texture, new Rectangle(32, 0, 32, 32), _debugPixel, Color.White));
                 Game1.addPart = false;
             }
-            else if(addPart && addBomb)
+            else if(addBomb)
             {
-                parts.Add(new Snake(_texture, new Rectangle(32, 32, 32, 32), _debugPixel));
+                parts.Add(new Snake(_texture, new Rectangle(32, 32, 32, 32), _debugPixel, Color.Black));
+                //Game1.addPart = false;
+                Game1.addBomb = false;
             }
 
             //Loop through the list of parts backwards...
@@ -164,7 +171,7 @@ namespace BombaSnake
 
         public void DrawSnake(List<Snake> parts)
         {
-            Globals._spriteBatch.Draw(_texture, _position, _sourceRect, Color.White);
+            Globals._spriteBatch.Draw(_texture, _position, _sourceRect, _partColour);
             //Globals._spriteBatch.Draw(_debugPixel, _colRect, Color.White);
         }
     }

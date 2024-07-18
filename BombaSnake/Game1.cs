@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace BombaSnake
@@ -72,10 +73,10 @@ namespace BombaSnake
             debugPixel = Content.Load<Texture2D>("Textures/DebugPixel");
 
             //Add the head to the parts list.
-            parts.Add(new Snake(texture, new Rectangle(0, 0, 32, 32), debugPixel));
+            parts.Add(new Snake(texture, new Rectangle(0, 0, 32, 32), debugPixel, Color.White));
             //Add two body parts to the snake.
-            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel));
-            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel));
+            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel, Color.White));
+            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel, Color.White));
 
             parts[0].SetUpBody(parts);
 
@@ -95,7 +96,7 @@ namespace BombaSnake
                     UpdateTitle();
                     break;
                 case GameState.Game:
-                    UpdateGame();
+                    UpdateGame(gameTime, keyboardState);
                     break;
                 case GameState.GameOver:
                     UpdateGameOver();
@@ -107,8 +108,20 @@ namespace BombaSnake
 
             // TODO: Add your update logic here
 
+            
+
+            base.Update(gameTime);
+        }
+
+        void UpdateTitle()
+        {
+
+        }
+
+        void UpdateGame(GameTime gameTime, KeyboardState keyboardState)
+        {
             //For each part of the snake...
-            foreach(Snake eachPart in parts)
+            foreach (Snake eachPart in parts)
             {
                 //...Update that part of the snake.
                 eachPart.UpdateSnake(gameTime, keyboardState, parts);
@@ -119,26 +132,27 @@ namespace BombaSnake
 
             bomb.UpdateBomb();
 
-            foreach(Snake eachPart in parts)
+            foreach (Snake eachPart in parts)
             {
-                if(eachPart == parts[0] && parts[0]._colRect.Intersects(food._colRect))
+                if (eachPart == parts[0] && parts[0]._colRect.Intersects(food._colRect))
                 {
                     //Call the Randomise position function inside the food class.
                     food.RandomisePosition();
                     //Set the add part boolean to true.
                     addPart = true;
+                    addBomb = false;
                 }
-                else if(eachPart != parts[0] && eachPart._colRect.Intersects(food._colRect))
+                else if (eachPart != parts[0] && eachPart._colRect.Intersects(food._colRect))
                 {
                     //Call the Randomise position function inside the food class.
                     food.RandomisePosition();
                 }
 
-                if(eachPart == parts[0] && parts[0]._colRect.Intersects(bomb._colRect))
+                if (eachPart == parts[0] && parts[0]._colRect.Intersects(bomb._colRect))
                 {
                     bomb.RandomisePosition();
 
-                    addPart = true;
+                    addPart = false;
                     addBomb = true;
                 }
             }
@@ -157,18 +171,6 @@ namespace BombaSnake
                 //Decrement the timer by the elapsed game time.
                 Globals._timer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
-
-            base.Update(gameTime);
-        }
-
-        void UpdateTitle()
-        {
-
-        }
-
-        void UpdateGame()
-        {
-
         }
 
         void UpdateGameOver()
@@ -197,17 +199,7 @@ namespace BombaSnake
                     break;
             }
 
-            //Draw the food to the screen.
-            food.DrawFood();
-
-            bomb.DrawBomb();
-
-            //For each part of the snake...
-            foreach (Snake eachPart in parts)
-            {
-                //Draw each part of the snake...
-                eachPart.DrawSnake(parts);
-            }
+            
 
             Globals._spriteBatch.End();
 
@@ -221,12 +213,22 @@ namespace BombaSnake
 
         void DrawGame()
         {
+            //Draw the food to the screen.
+            food.DrawFood();
 
+            bomb.DrawBomb();
+
+            //For each part of the snake...
+            foreach (Snake eachPart in parts)
+            {
+                //Draw each part of the snake...
+                eachPart.DrawSnake(parts);
+            }
         }
 
         void DrawGameOver()
         {
-
+            GraphicsDevice.Clear(Color.Blue);
         }
 
     }

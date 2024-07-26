@@ -84,9 +84,13 @@ namespace BombaSnake
                     if (parts[i] != parts[j] && parts[i] == parts[0] && parts[i]._colRect.Intersects(parts[j]._colRect))
                     {
                         Game1.gameState = Game1.GameState.GameOver;
-                        Debug.WriteLine("I collided");
                     }
                 }
+            }
+
+            if(parts.Count <= 0)
+            {
+                Game1.gameState = Game1.GameState.GameOver;
             }
 
             for(int i = 0; i < parts.Count; i++)
@@ -95,16 +99,38 @@ namespace BombaSnake
                 {
                     int startIndex  = i - 2;
 
+                    if(startIndex < 0)
+                    {
+                        startIndex = 0;
+                    }
+
                     if (keyboardState.IsKeyDown(Keys.Space))
                     {
-                        parts.RemoveRange(startIndex, parts.Count - startIndex);
-
-                        //Debug.WriteLine("Bomb went Boom");
+                        if (startIndex > 0)
+                        {
+                            if (parts.Count > 0)
+                            {
+                                parts.RemoveRange(startIndex, parts.Count - startIndex); 
+                            }
+                        }
                     }
                 }
             }
 
-            Debug.WriteLine(_bombTimer);
+            if (_bombColour == Color.Black && _bombTimer <= 0)
+            {
+                _bombColour = Color.Red;
+                _bombTimer = _maxBombTimer;
+            }
+            else if (_bombColour == Color.Red && _bombTimer <= 0)
+            {
+                _bombColour = Color.Black;
+                _bombTimer = _maxBombTimer;
+            }
+            else
+            {
+                _bombTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+            }
         }
 
         void CheckPosition()
@@ -204,27 +230,12 @@ namespace BombaSnake
 
             for (int i = 0; i < parts.Count; i++)
             {
-                if (parts[i]._isPart)
+                if (this._isPart)
                 {
                     Globals._spriteBatch.Draw(_texture, _position, _sourceRect, _partColour);
                 }
-                else if (parts[i]._isBomb)
+                else if (this._isBomb)
                 {
-                    if (parts[i]._isBomb && _bombColour == Color.Black && _bombTimer <= 0)
-                    {
-                        _bombColour = Color.Red;
-                        _bombTimer = _maxBombTimer;
-                    }
-                    else if (parts[i]._isBomb && _bombColour == Color.Red && _bombTimer <= 0)
-                    {
-                        _bombColour = Color.Black;
-                        _bombTimer = _maxBombTimer;
-                    }
-                    else
-                    {
-                        _bombTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    }
-
                     Globals._spriteBatch.Draw(_texture, _position, _sourceRect, _bombColour);
                 }
             }

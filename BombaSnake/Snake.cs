@@ -13,6 +13,12 @@ namespace BombaSnake
     {
         int _gridSize = 32;
 
+        bool _isPart;
+        bool _isBomb;
+
+        float _bombTimer = 0f;
+        float _maxBombTimer = 1f;
+
         Vector2 _position;
 
         Vector2 _direction = new Vector2(0, 1);
@@ -20,12 +26,13 @@ namespace BombaSnake
         Rectangle _sourceRect;
         public Rectangle _colRect;
 
+        Color _bombColour;
         Color _partColour;
 
         Texture2D _texture;
         Texture2D _debugPixel;
 
-        public Snake(Texture2D texture, Rectangle sourceRect, Texture2D debugPixel, Color partColour) 
+        public Snake(Texture2D texture, Rectangle sourceRect, Texture2D debugPixel, Color partColour, bool isPart, bool isBomb) 
         {
             _texture = texture;
             _debugPixel = debugPixel;
@@ -33,6 +40,11 @@ namespace BombaSnake
             _sourceRect = sourceRect;
 
             _partColour = partColour;
+
+            _bombColour = Color.Black;
+
+            _isPart = isPart;
+            _isBomb = isBomb;
 
             _position = new Vector2(Globals._windowSize.X / 2 - _sourceRect.Width / 2,
                  Globals._windowSize.Y / 2 - _sourceRect.Height / 2);
@@ -76,6 +88,23 @@ namespace BombaSnake
                     }
                 }
             }
+
+            for(int i = 0; i < parts.Count; i++)
+            {
+                if (parts[i]._isBomb)
+                {
+                    int startIndex  = i - 2;
+
+                    if (keyboardState.IsKeyDown(Keys.Space))
+                    {
+                        parts.RemoveRange(startIndex, parts.Count - startIndex);
+
+                        //Debug.WriteLine("Bomb went Boom");
+                    }
+                }
+            }
+
+            Debug.WriteLine(_bombTimer);
         }
 
         void CheckPosition()
@@ -136,12 +165,12 @@ namespace BombaSnake
 
             if(addPart)
             {
-                parts.Add(new Snake(_texture, new Rectangle(32, 0, 32, 32), _debugPixel, Color.White));
+                parts.Add(new Snake(_texture, new Rectangle(32, 0, 32, 32), _debugPixel, Color.White, true, false));
                 Game1.addPart = false;
             }
             else if(addBomb)
             {
-                parts.Add(new Snake(_texture, new Rectangle(32, 32, 32, 32), _debugPixel, Color.Black));
+                parts.Add(new Snake(_texture, new Rectangle(32, 32, 32, 32), _debugPixel, Color.White, false, true));
                 //Game1.addPart = false;
                 Game1.addBomb = false;
             }
@@ -169,9 +198,38 @@ namespace BombaSnake
             }
         }
 
-        public void DrawSnake(List<Snake> parts)
+        public void DrawSnake(List<Snake> parts, GameTime gameTime)
         {
-            Globals._spriteBatch.Draw(_texture, _position, _sourceRect, _partColour);
+            
+
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (parts[i]._isPart)
+                {
+                    Globals._spriteBatch.Draw(_texture, _position, _sourceRect, _partColour);
+                }
+                else if (parts[i]._isBomb)
+                {
+                    if (parts[i]._isBomb && _bombColour == Color.Black && _bombTimer <= 0)
+                    {
+                        _bombColour = Color.Red;
+                        _bombTimer = _maxBombTimer;
+                    }
+                    else if (parts[i]._isBomb && _bombColour == Color.Red && _bombTimer <= 0)
+                    {
+                        _bombColour = Color.Black;
+                        _bombTimer = _maxBombTimer;
+                    }
+                    else
+                    {
+                        _bombTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    }
+
+                    Globals._spriteBatch.Draw(_texture, _position, _sourceRect, _bombColour);
+                }
+            }
+
+            //Globals._spriteBatch.Draw(_texture, _position, _sourceRect, _partColour);
             //Globals._spriteBatch.Draw(_debugPixel, _colRect, Color.White);
         }
     }

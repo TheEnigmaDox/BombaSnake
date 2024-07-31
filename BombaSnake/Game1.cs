@@ -130,21 +130,33 @@ namespace BombaSnake
             //Update the food.
             food.UpdateFood();
 
-            if (parts.Count >= 5)
+            foreach(Snake eachPart in parts)
             {
-                for(int i = 0; i < parts.Count;i++)
+                if (eachPart._isBomb)
                 {
-                    if (parts[i]._isBomb)
-                    {
-                        hasBomb = true;
-                    }
-
-                    if (!hasBomb)
-                    {
-                        bomb.UpdateBomb();
-                    }
+                    hasBomb = true; 
+                }
+                else
+                {
+                    bomb.UpdateBomb();
                 }
             }
+
+            //if (parts.Count >= 5)
+            //{
+            //    for(int i = 0; i < parts.Count;i++)
+            //    {
+            //        if (parts[i]._isBomb)
+            //        {
+            //            hasBomb = true;
+            //        }
+
+            //        if (!hasBomb)
+            //        {
+            //            bomb.UpdateBomb();
+            //        }
+            //    }
+            //}
 
             foreach (Snake eachPart in parts)
             {
@@ -230,10 +242,18 @@ namespace BombaSnake
             //Draw the food to the screen.
             food.DrawFood();
             
-            if (parts.Count >= 5 && !hasBomb)
+            foreach(Snake eachPart in parts)
             {
-                bomb.DrawBomb(); 
+                if(parts.Count >= 5 && !hasBomb)
+                {
+                    bomb.DrawBomb();
+                }
             }
+
+            //if (parts.Count >= 5 && !hasBomb)
+            //{
+            //    bomb.DrawBomb(); 
+            //}
 
             //For each part of the snake...
             foreach (Snake eachPart in parts)

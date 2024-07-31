@@ -26,6 +26,8 @@ namespace BombaSnake
         //A boolean accessable to all classes to decide whether to add a body part or not.
         public static bool addBomb = false;
 
+        public static bool hasBomb = false;
+
         //A list to hold all the parts of the snake.
         List<Snake> parts = new List<Snake>();
 
@@ -120,13 +122,6 @@ namespace BombaSnake
 
         void UpdateGame(GameTime gameTime, KeyboardState keyboardState)
         {
-            ////For each part of the snake...
-            //foreach (Snake eachPart in parts)
-            //{
-            //    //...Update that part of the snake.
-            //    eachPart.UpdateSnake(gameTime, keyboardState, parts);
-            //}
-
             for(int i = 0; i < parts.Count; i++)
             {
                 parts[i].UpdateSnake(gameTime, keyboardState, parts);
@@ -135,7 +130,21 @@ namespace BombaSnake
             //Update the food.
             food.UpdateFood();
 
-            bomb.UpdateBomb();
+            if (parts.Count >= 5)
+            {
+                for(int i = 0; i < parts.Count;i++)
+                {
+                    if (parts[i]._isBomb)
+                    {
+                        hasBomb = true;
+                    }
+
+                    if (!hasBomb)
+                    {
+                        bomb.UpdateBomb();
+                    }
+                }
+            }
 
             foreach (Snake eachPart in parts)
             {
@@ -220,8 +229,11 @@ namespace BombaSnake
         {
             //Draw the food to the screen.
             food.DrawFood();
-
-            bomb.DrawBomb();
+            
+            if (parts.Count >= 5 && !hasBomb)
+            {
+                bomb.DrawBomb(); 
+            }
 
             //For each part of the snake...
             foreach (Snake eachPart in parts)

@@ -14,7 +14,7 @@ namespace BombaSnake
         int _gridSize = 32;
 
         bool _isPart;
-        bool _isBomb;
+        public bool _isBomb;
 
         float _bombTimer = 0f;
         float _maxBombTimer = 1f;
@@ -77,22 +77,6 @@ namespace BombaSnake
             CheckInputs(keyboardState);
             CheckPosition();
 
-            for (int i = 0; i < parts.Count - 1; i++)
-            {
-                for (int j = 0; j < parts.Count - 1; j++)
-                {
-                    if (parts[i] != parts[j] && parts[i] == parts[0] && parts[i]._colRect.Intersects(parts[j]._colRect))
-                    {
-                        Game1.gameState = Game1.GameState.GameOver;
-                    }
-                }
-            }
-
-            if(parts.Count <= 0)
-            {
-                Game1.gameState = Game1.GameState.GameOver;
-            }
-
             for(int i = 0; i < parts.Count; i++)
             {
                 if (parts[i]._isBomb)
@@ -106,6 +90,8 @@ namespace BombaSnake
 
                     if (keyboardState.IsKeyDown(Keys.Space))
                     {
+                        Game1.hasBomb = false;
+
                         if (startIndex > 0)
                         {
                             if (parts.Count > 0)
@@ -221,6 +207,17 @@ namespace BombaSnake
                     (int)eachPart._position.Y + 4,
                     eachPart._sourceRect.Width - 8,
                     eachPart._sourceRect.Height - 8);
+            }
+
+            for (int i = 0; i < parts.Count - 1; i++)
+            {
+                for (int j = 0; j < parts.Count - 1; j++)
+                {
+                    if (parts[i] != parts[j] && parts[i] == parts[0] && parts[i]._colRect.Intersects(parts[j]._colRect))
+                    {
+                        Game1.gameState = Game1.GameState.GameOver;
+                    }
+                }
             }
         }
 

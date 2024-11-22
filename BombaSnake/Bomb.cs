@@ -6,10 +6,12 @@ namespace BombaSnake
 {
     internal class Bomb
     {
+        public bool _UpdateColRect = true;
+
         Vector2 _position;
 
         Rectangle _sourceRect;
-        public Rectangle _colRect;
+        public Rectangle? _colRect;
 
         Texture2D _texture;
         Texture2D _debugPixel;
@@ -45,12 +47,23 @@ namespace BombaSnake
 
         void UpdateCollision()
         {
-            _colRect = new Rectangle((int)_position.X + 3, (int)_position.Y + 3, _sourceRect.Width - 6, _sourceRect.Height - 6);
+            if (_UpdateColRect)
+            {
+                _colRect = new Rectangle((int)_position.X + 3, (int)_position.Y + 3, _sourceRect.Width - 6, _sourceRect.Height - 6); 
+            }
+            else
+            {
+                _colRect = null;
+            }
         }
 
         public void DrawBomb()
         {
-            //Globals._spriteBatch.Draw(_debugPixel, _colRect, Color.White);
+            if (_colRect.HasValue)
+            {
+                Globals._spriteBatch.Draw(_debugPixel, _colRect.Value, Color.White); 
+            }
+            
             Globals._spriteBatch.Draw(_texture, _position, _sourceRect, Color.White);
         }
     }

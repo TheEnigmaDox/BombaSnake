@@ -110,8 +110,6 @@ namespace BombaSnake
 
             // TODO: Add your update logic here
 
-            
-
             base.Update(gameTime);
         }
 
@@ -134,29 +132,17 @@ namespace BombaSnake
             {
                 if (eachPart._isBomb)
                 {
-                    hasBomb = true; 
+                    hasBomb = true;
+                    bomb._UpdateColRect = false;
                 }
-                else
+                else if(!eachPart._isBomb && parts.Count >= 5)
                 {
-                    bomb.UpdateBomb();
+                    hasBomb = false;
+                    bomb._UpdateColRect = true;
                 }
             }
 
-            //if (parts.Count >= 5)
-            //{
-            //    for(int i = 0; i < parts.Count;i++)
-            //    {
-            //        if (parts[i]._isBomb)
-            //        {
-            //            hasBomb = true;
-            //        }
-
-            //        if (!hasBomb)
-            //        {
-            //            bomb.UpdateBomb();
-            //        }
-            //    }
-            //}
+            bomb.UpdateBomb();
 
             foreach (Snake eachPart in parts)
             {
@@ -174,12 +160,14 @@ namespace BombaSnake
                     food.RandomisePosition();
                 }
 
-                if (eachPart == parts[0] && parts[0]._colRect.Intersects(bomb._colRect))
+                if (bomb._colRect.HasValue)
                 {
-                    bomb.RandomisePosition();
-
-                    addPart = false;
-                    addBomb = true;
+                    if (eachPart == parts[0] && parts[0]._colRect.Intersects(bomb._colRect.Value))
+                    {
+                        addPart = false;
+                        addBomb = true;
+                        bomb._UpdateColRect = false;
+                    } 
                 }
             }
 
@@ -225,8 +213,6 @@ namespace BombaSnake
                     break;
             }
 
-            
-
             Globals._spriteBatch.End();
 
             base.Draw(gameTime);
@@ -241,19 +227,19 @@ namespace BombaSnake
         {
             //Draw the food to the screen.
             food.DrawFood();
-            
+
             foreach(Snake eachPart in parts)
             {
-                if(parts.Count >= 5 && !hasBomb)
+                if (eachPart._isBomb)
                 {
-                    bomb.DrawBomb();
+
                 }
             }
 
-            //if (parts.Count >= 5 && !hasBomb)
-            //{
-            //    bomb.DrawBomb(); 
-            //}
+            if (parts.Count >= 5 && !hasBomb)
+            {
+                
+            }
 
             //For each part of the snake...
             foreach (Snake eachPart in parts)
@@ -267,6 +253,5 @@ namespace BombaSnake
         {
             GraphicsDevice.Clear(Color.Blue);
         }
-
     }
 }

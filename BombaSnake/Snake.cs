@@ -223,8 +223,6 @@ namespace BombaSnake
 
         public void DrawSnake(List<Snake> parts, GameTime gameTime)
         {
-            
-
             for (int i = 0; i < parts.Count; i++)
             {
                 if (this._isPart)

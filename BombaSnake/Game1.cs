@@ -75,10 +75,10 @@ namespace BombaSnake
             debugPixel = Content.Load<Texture2D>("Textures/DebugPixel");
 
             //Add the head to the parts list.
-            parts.Add(new Snake(texture, new Rectangle(0, 0, 32, 32), debugPixel, Color.White, true, false));
+            parts.Add(new Snake(texture, new Rectangle(0, 0, 32, 32), debugPixel, Color.Lavender, true, false));
             //Add two body parts to the snake.
-            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel, Color.White, true, false));
-            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel, Color.White, true, false));
+            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel, Color.Lavender, true, false));
+            parts.Add(new Snake(texture, new Rectangle(32, 0, 32, 32), debugPixel, Color.Lavender, true, false));
 
             parts[0].SetUpBody(parts);
 

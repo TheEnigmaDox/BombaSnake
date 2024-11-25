@@ -32,7 +32,8 @@ namespace BombaSnake
         Texture2D _texture;
         Texture2D _debugPixel;
 
-        public Snake(Texture2D texture, Rectangle sourceRect, Texture2D debugPixel, Color partColour, bool isPart, bool isBomb) 
+        public Snake(Texture2D texture, Rectangle sourceRect, Texture2D debugPixel,
+            Color partColour, bool isPart, bool isBomb) 
         {
             _texture = texture;
             _debugPixel = debugPixel;
@@ -213,7 +214,9 @@ namespace BombaSnake
             {
                 for (int j = 0; j < parts.Count - 1; j++)
                 {
-                    if (parts[i] != parts[j] && parts[i] == parts[0] && parts[i]._colRect.Intersects(parts[j]._colRect))
+                    if (parts[i] != parts[j] &&
+                        parts[i] == parts[0] &&
+                        parts[i]._colRect.Intersects(parts[j]._colRect))
                     {
                         Game1.gameState = Game1.GameState.GameOver;
                     }
